@@ -2,6 +2,11 @@
 
 # Object detection with PowerAI Vision
 
+### Screenshots from Safety related Inferencing Model:
+
+![Camera Mode](doc/source/images/CameraMode.png)
+![File Mode](doc/source/images/FileMode.png)
+
 In this Code Pattern, we will use PowerAI Vision Object Detection
 to detect and label objects, within an image, based on customized
 training.
