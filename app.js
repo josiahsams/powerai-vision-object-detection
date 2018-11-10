@@ -14,23 +14,25 @@
  * the License.
  */
 
-'use strict';
+"use strict";
 /* eslint-env node */
 
-const express = require('express');
-const request = require('request');
-const MISSING_ENV =
-  'Missing required runtime environment variable POWERAI_VISION_WEB_API_URL';
+const express = require("express");
+const request = require("request");
 
-require('dotenv').config({
-  silent: true,
+const MISSING_ENV =
+  "Missing required runtime environment variable POWERAI_VISION_WEB_API_URL";
+
+require("dotenv").config({
+  silent: true
 });
 
 const app = express();
 const port = process.env.PORT || process.env.VCAP_APP_PORT || 8081;
 const poweraiVisionWebApiUrl = process.env.POWERAI_VISION_WEB_API_URL;
+// app.use(formidable());
 
-console.log('Web API URL: ' + poweraiVisionWebApiUrl);
+console.log("Web API URL: " + poweraiVisionWebApiUrl);
 
 if (!poweraiVisionWebApiUrl) {
   console.log(MISSING_ENV);
@@ -38,26 +40,35 @@ if (!poweraiVisionWebApiUrl) {
 
 app.use(express.static(__dirname));
 
-app.post('/uploadpic', function(req, result) {
+app.post("/uploadpic", function(req, result) {
   if (!poweraiVisionWebApiUrl) {
     console.log(MISSING_ENV);
-    result.send({data: JSON.stringify({error: MISSING_ENV})});
+    result.send({ data: JSON.stringify({ error: MISSING_ENV }) });
   } else {
-    req.pipe(request.post({
-      url: poweraiVisionWebApiUrl,
-      agentOptions: {
-        rejectUnauthorized: false,
-      }}, function(err, resp, body) {
-      if (err) {
-        console.log(err);
-      }
-      console.log(body);
-      result.send({data: body});
-    }));
+    req.pipe(
+      request.post(
+        {
+          url: poweraiVisionWebApiUrl,
+          // headers: {
+          //   Authorization: "Bearer 6c3e9127-3af1-45ea-9b37-fc41c1986a51"
+          // },
+          gzip: true,
+          agentOptions: {
+            rejectUnauthorized: false
+          }
+        },
+        function(err, resp, body) {
+          if (err) {
+            console.log(err);
+          }
+          console.log(body);
+          result.send({ data: body });
+        }
+      )
+    );
   }
 });
 
 app.listen(port, () => {
   console.log(`Server starting on ${port}`);
 });
-

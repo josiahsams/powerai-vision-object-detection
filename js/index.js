@@ -26,12 +26,19 @@
  * @param {[]} values
  */
 function addRow(table, cellType, values) {
-  const row = document.createElement('tr');
+  const row = document.createElement("tr");
   for (let i = 0; i < values.length; i++) {
     const val = values[i];
     const cell = document.createElement(cellType);
-    const text = document.createTextNode(val);
-    cell.appendChild(text);
+    if (val.includes("i class")) {
+      // const text = document.createElement("div");
+      // console.log(val);
+      cell.innerHTML = val;
+      // cell.appendChild(text);
+    } else {
+      const text = document.createTextNode(val);
+      cell.appendChild(text);
+    }
     row.appendChild(cell);
   }
   table.appendChild(row);
@@ -44,10 +51,14 @@ function addRow(table, cellType, values) {
  */
 function textColor(label) {
   switch (label) {
-    case 'coca-cola': return 'white';
-    case 'diet coke': return 'red';
-    case 'coke zero': return 'white';
-    default: return 'cornsilk';
+    case "coca-cola":
+      return "white";
+    case "diet coke":
+      return "red";
+    case "coke zero":
+      return "white";
+    default:
+      return "cornsilk";
   }
 }
 
@@ -58,10 +69,14 @@ function textColor(label) {
  */
 function boundaryColor(label) {
   switch (label) {
-    case 'coca-cola': return 'red';
-    case 'diet coke': return 'silver';
-    case 'coke zero': return 'black';
-    default: return 'cornflowerblue';
+    case "coca-cola":
+      return "red";
+    case "diet coke":
+      return "silver";
+    case "coke zero":
+      return "black";
+    default:
+      return "cornflowerblue";
   }
 }
 
@@ -75,7 +90,7 @@ function countByLabel(detectedObjects) {
   if (detectedObjects.length > 0) {
     for (let i = 0; i < detectedObjects.length; i++) {
       const obj = detectedObjects[i];
-      const label = obj['label'];
+      const label = obj["label"];
       countByLabel[label] = (countByLabel[label] || 0) + 1;
     }
   }
@@ -83,10 +98,10 @@ function countByLabel(detectedObjects) {
   let retStrings = [];
   for (const key in countByLabel) {
     if (countByLabel.hasOwnProperty(key)) {
-      retStrings.push(countByLabel[key] + ' ' + key); // e.g. 1 coca-cola
+      retStrings.push(countByLabel[key] + " " + key); // e.g. 1 coca-cola
     }
   }
-  return retStrings.join(', ');
+  return retStrings.join(", ");
 }
 
 /**
@@ -96,18 +111,18 @@ function countByLabel(detectedObjects) {
  */
 function drawBoundaryBoxes(detectedObjects, ctx) {
   ctx.lineWidth = 5;
-  ctx.font='24px serif';
+  ctx.font = "24px serif";
 
   if (detectedObjects.length > 0) {
     for (let i = 0; i < detectedObjects.length; i++) {
       const obj = detectedObjects[i];
-      const label = obj['label'];
+      const label = obj["label"];
       const color = boundaryColor(label);
       ctx.strokeStyle = color;
-      const xmin = obj['xmin'];
-      const ymin = obj['ymin'];
-      const xmax = obj['xmax'];
-      const ymax = obj['ymax'];
+      const xmin = obj["xmin"];
+      const ymin = obj["ymin"];
+      const xmax = obj["xmax"];
+      const ymax = obj["ymax"];
       ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
 
       // Now fill a rectangle at the top to put some text on.
@@ -115,7 +130,10 @@ function drawBoundaryBoxes(detectedObjects, ctx) {
       ctx.fillRect(xmin, ymin, xmax - xmin, 25);
       ctx.fillStyle = textColor(label);
       ctx.fillText(
-        label + ': ' + obj['confidence'].toFixed(3), xmin + 5, ymin + 20);
+        label + ": " + obj["confidence"].toFixed(3),
+        xmin + 5,
+        ymin + 20
+      );
     }
   }
 }
@@ -127,74 +145,83 @@ function drawBoundaryBoxes(detectedObjects, ctx) {
  */
 function detectedObjectsTable(detectedObjects, parent) {
   if (detectedObjects.length > 0) {
-    const table = document.createElement('table');
+    const table = document.createElement("table");
 
-    addRow(table, 'th', ['Label', 'Conf', 'Min Pos', 'Max Pos']);
+    // addRow(table, "th", ["Label", "Conf", "Min Pos", "Max Pos"]);
 
+    addRow(table, "th", ["Items", "Safety"]);
     for (let i = 0; i < detectedObjects.length; i++) {
       const obj = detectedObjects[i];
-      const label = obj['label'];
-      const conf = obj['confidence'].toFixed(3);
-      const minPos = '(' + obj['xmin'] + ',' + obj['ymin'] + ')';
-      const maxPos = '(' + obj['xmax'] + ',' + obj['ymax'] + ')';
-
-      addRow(table, 'td', [label, conf, minPos, maxPos]);
+      const label = obj["label"];
+      // const safe = label.contains("no") ? "Down" : "Up";
+      let safe = "<i class='far fa-thumbs-up fa-2x' style='color:green'></i>";
+      if (label.includes("no")) {
+        safe = "<i class='far fa-thumbs-down fa-2x' style='color:red'></i>";
+      }
+      addRow(table, "td", [label, safe]);
     }
     parent.appendChild(table);
   }
 }
 
-window.addEventListener('load', function() {
-  const article = document.querySelector('article');
+window.addEventListener("load", function() {
+  // const article = document.querySelector("#results");
 
   /**
    * Populate the article with formatted results.
    * @param {Object} jsonResult
    */
-  function populateArticle(jsonResult) {
+  function populateArticle(jsonResult, myImg, article) {
     // Remove previous results
-    article.innerHTML = '';
+    article.innerHTML = "";
 
     // Show the image if one was returned.
-    if (jsonResult.hasOwnProperty('imageUrl')) {
-      const myImg = new Image();
-      myImg.style.display = 'none';
-      myImg.onload = function() {
-        const myCanvas = document.createElement('canvas');
-        const ctx = myCanvas.getContext('2d');
-        ctx.canvas.height = myImg.height;
-        ctx.canvas.width = myImg.width;
-        ctx.drawImage(myImg, 0, 0, myImg.width, myImg.height);
-        if (jsonResult.hasOwnProperty('classified')) {
-          drawBoundaryBoxes(jsonResult.classified, ctx);
-        }
-        article.appendChild(myCanvas);
-      };
-      myImg.src = jsonResult.imageUrl;
-      article.appendChild(myImg);
+    if (jsonResult.hasOwnProperty("imageUrl")) {
+      // const myImg = new Image();
+      // const myImg = document.querySelector("#grid");
+      // myImg.style.display = "none";
+
+      const myCanvas = document.createElement("canvas");
+      const ctx = myCanvas.getContext("2d");
+      ctx.canvas.height = myImg.height;
+      ctx.canvas.width = myImg.width;
+      ctx.drawImage(myImg, 0, 0, myImg.width, myImg.height);
+      if (jsonResult.hasOwnProperty("classified")) {
+        drawBoundaryBoxes(jsonResult.classified, ctx);
+      }
+
+      //article.appendChild(myCanvas);
+      myImg.setAttribute("src", myCanvas.toDataURL());
+
+      // document
+      //   .querySelector("#grid")
+      //   .setAttribute("srcObject", myImg.srcObject);
+
+      //  myImg.src = imgSrc;
+      // article.appendChild(myImg);
     }
 
-    if (jsonResult.hasOwnProperty('classified')) {
+    if (jsonResult.hasOwnProperty("classified")) {
       let classified = jsonResult.classified;
 
-      const myCount = document.createElement('h3');
-      myCount.textContent = classified.length + ' objects detected';
+      const myCount = document.createElement("h5");
+      myCount.textContent = classified.length + " objects detected";
       article.appendChild(myCount);
-      article.appendChild(document.createTextNode(countByLabel(classified)));
+      // article.appendChild(document.createTextNode(countByLabel(classified)));
 
       detectedObjectsTable(classified, article);
     } else {
-      const myDiv = document.createElement('div');
-      myDiv.className = 'error';
-      myDiv.id = 'error-div';
-      const myTitle = document.createElement('h3');
-      myTitle.textContent = 'ERROR';
+      const myDiv = document.createElement("div");
+      myDiv.className = "error";
+      myDiv.id = "error-div";
+      const myTitle = document.createElement("h3");
+      myTitle.textContent = "ERROR";
       myDiv.appendChild(myTitle);
       // Dump keys/values to show error info
       for (const key in jsonResult) {
         if (jsonResult.hasOwnProperty(key)) {
-          const myP = document.createElement('p');
-          myP.textContent = key + ':  ' + jsonResult[key];
+          const myP = document.createElement("p");
+          myP.textContent = key + ":  " + jsonResult[key];
           myDiv.appendChild(myP);
         }
       }
@@ -203,21 +230,167 @@ window.addEventListener('load', function() {
   }
 
   // When upload results are loaded (hidden), use them build the results.
-  const raw = top.frames['mytarget'];
-  const myTarget = document.getElementById('mytarget');
-  if (myTarget) { // optional for tests
-    myTarget.addEventListener('load', function() {
+  const raw = top.frames["mytarget"];
+  const myTarget = document.getElementById("mytarget");
+  if (myTarget) {
+    // optional for tests
+    myTarget.addEventListener("load", function() {
+      console.log("Got Response");
+      imgSrc = document.getElementById("grid").src;
       let rawContent = raw.document.body.innerText;
       let rawJson = JSON.parse(rawContent);
       let rawJsonJson = JSON.parse(rawJson.data);
       console.log(rawJsonJson);
 
-      populateArticle(rawJsonJson);
+      populateArticle(rawJsonJson, imgSrc);
     });
   }
+
+  function dataURLtoBlob(dataURL) {
+    var BASE64_MARKER = ";base64,";
+    if (dataURL.indexOf(BASE64_MARKER) == -1) {
+      var parts = dataURL.split(",");
+      var contentType = parts[0].split(":")[1];
+      var raw = decodeURIComponent(parts[1]);
+      return new Blob([raw], {
+        type: contentType
+      });
+    }
+
+    var parts = dataURL.split(BASE64_MARKER);
+    var contentType = parts[0].split(":")[1];
+    var raw = window.atob(parts[1]);
+    var rawLength = raw.length;
+    var uInt8Array = new Uint8Array(rawLength);
+
+    for (var i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], {
+      type: contentType
+    });
+  }
+
+  const capture = () => {
+    const canvas = document.createElement("canvas");
+    document.querySelector("body").appendChild(canvas);
+
+    const videoElement = document.querySelector("#videoElement");
+    canvas.width = 480;
+    canvas.height = 360;
+
+    canvas
+      .getContext("2d")
+      .drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+    // get image data URL and remove canvas
+    const snapshot = canvas.toDataURL("image/png");
+    canvas.parentNode.removeChild(canvas);
+
+    document.querySelector("#grid").setAttribute("src", snapshot);
+
+    // Load the captured image into the form data before posting
+    const formData = new FormData();
+    var blob = dataURLtoBlob(snapshot);
+    console.log(blob);
+    formData.append("files", blob, "sample.png");
+
+    // send a async post request
+    fetch("./uploadpic", {
+      method: "POST",
+      redirect: "follow",
+      body: formData
+    })
+      .then(response => {
+        console.log(response);
+        return response.json();
+      })
+      .then(rawJson => {
+        imgSrc = document.getElementById("grid").src;
+        let rawJsonJson = JSON.parse(rawJson.data);
+        populateArticle(
+          rawJsonJson,
+          document.querySelector("#grid"),
+          document.querySelector("#results")
+        );
+      });
+  };
+
+  var constraints = { audio: false, video: { width: 640, height: 480 } };
+
+  var video = document.querySelector("#videoElement");
+  var localstream;
+  if (navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(function(stream) {
+        video.srcObject = stream;
+        localstream = stream;
+        document.getElementById("capture").addEventListener("click", () => {
+          capture();
+        });
+        document.getElementById("stop").addEventListener("click", () => {
+          stopVideo();
+        });
+      })
+      .catch(function(error) {
+        console.log("Something went wrong!");
+      });
+  }
+  function stopVideo() {
+    //clearInterval(theDrawLoop);
+    //ExtensionData.vidStatus = 'off';
+    video.pause();
+    video.src = "";
+    localstream.getTracks()[0].stop();
+    console.log("Camera off");
+  }
+
+  var openFile = function(event) {
+    var input = event.target;
+    var dataURL = null;
+
+    var reader = new FileReader();
+    reader.onload = function() {
+      dataURL = reader.result;
+      var output = document.getElementById("uploadImg");
+      output.src = dataURL;
+
+      // Load the captured image into the form data before posting
+      const formData = new FormData();
+      var blob = dataURLtoBlob(dataURL);
+      console.log(blob);
+      formData.append("files", blob, "sample.png");
+
+      // send a async post request
+      fetch("./uploadpic", {
+        method: "POST",
+        redirect: "follow",
+        body: formData
+      })
+        .then(response => {
+          console.log(response);
+          return response.json();
+        })
+        .then(rawJson => {
+          imgSrc = document.getElementById("uploadImg").src;
+          let rawJsonJson = JSON.parse(rawJson.data);
+          populateArticle(
+            rawJsonJson,
+            document.querySelector("#uploadImg"),
+            document.querySelector("#results2")
+          );
+        });
+    };
+    reader.readAsDataURL(input.files[0]);
+  };
+
+  document.getElementById("uploadfile").addEventListener("change", event => {
+    openFile(event);
+  });
 });
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = {addRow, textColor}; // for testing
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  module.exports = { addRow, textColor, populateArticle }; // for testing
 }
-
