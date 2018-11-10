@@ -51,11 +51,17 @@ function addRow(table, cellType, values) {
  */
 function textColor(label) {
   switch (label) {
-    case "coca-cola":
+    case "no_glove":
       return "white";
-    case "diet coke":
+    case "no_helmet":
       return "red";
-    case "coke zero":
+    case "no_vest":
+      return "white";
+    case "glove":
+      return "white";
+    case "helmet":
+      return "red";
+    case "vest":
       return "white";
     default:
       return "cornsilk";
@@ -69,11 +75,17 @@ function textColor(label) {
  */
 function boundaryColor(label) {
   switch (label) {
-    case "coca-cola":
+    case "no_glove":
       return "red";
-    case "diet coke":
+    case "no_helmet":
       return "silver";
-    case "coke zero":
+    case "no_vest":
+      return "black";
+    case "glove":
+      return "red";
+    case "helmet":
+      return "silver";
+    case "vest":
       return "black";
     default:
       return "cornflowerblue";
