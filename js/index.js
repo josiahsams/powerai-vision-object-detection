@@ -327,6 +327,11 @@ window.addEventListener("load", function() {
           document.querySelector("#results")
         );
       });
+    document.querySelector("#results").innerHTML =
+      "<div> \
+        <div class='fa-4x'>  \
+          <i class='fas fa-cog fa-large fa-spin'></i> \
+        </div><br/>Uploading the image <br/>for inferencing ... </div>";
   };
 
   var constraints = { audio: false, video: { width: 640, height: 480 } };
@@ -395,12 +400,23 @@ window.addEventListener("load", function() {
           );
         });
     };
+    document.querySelector("#results2").innerHTML =
+      "<div> \
+      <div class='fa-4x'>  \
+        <i class='fas fa-cog fa-large fa-spin'></i> \
+      </div><br/>Uploading the image <br/>for inferencing ... </div>";
     reader.readAsDataURL(input.files[0]);
   };
 
   document.getElementById("uploadfile").addEventListener("change", event => {
     openFile(event);
   });
+
+  document
+    .querySelector("#fileuploadbutton")
+    .addEventListener("click", event => {
+      $("#uploadfile").trigger("click");
+    });
 });
 
 if (typeof module !== "undefined" && typeof module.exports !== "undefined") {

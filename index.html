@@ -54,11 +54,13 @@
       <ul class="nav nav-tabs">
         <li class="nav-item">
           <a class="nav-link active" href="#cam" data-toggle="tab">
-            Camera Mode
+            Camera Mode <i class="fas fa-video"></i>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#fil" data-toggle="tab">File Mode</a>
+          <a class="nav-link" href="#fil" data-toggle="tab">
+            File Mode <i class="fas fa-file-image"></i
+          ></a>
         </li>
       </ul>
 
@@ -70,8 +72,16 @@
                 <video autoplay="true" id="videoElement"></video>
               </div>
             </div>
-            <div class="col">
-              <div id="results" style="width: 200px; margin-top: 50px "></div>
+            <div class="col" style="width: 100px;">
+              <div
+                id="results"
+                style="margin-top: 50px;align-content: center;text-align: center; "
+              >
+                <div class="fa-2x">
+                  Click capture !! <br />
+                  <i class="fas fa-camera fa-large"></i>
+                </div>
+              </div>
             </div>
             <div class="col">
               <div style="width: 500px;margin-top: 10px; ">
@@ -89,10 +99,10 @@
                 class="btn btn-primary btn-lg"
                 style="margin-right: 100px;"
               >
-                Capture & Detect
+                Capture & Detect <i class="fas fa-camera"></i>
               </button>
               <button id="stop" type="button" class="btn btn-secondary btn-lg">
-                Stop Camera
+                Stop Camera <i class="fas fa-ban"></i>
               </button>
             </div>
           </div>
@@ -102,12 +112,35 @@
           <div class="row">
             <div
               class="col"
-              style="margin-left: 30px; margin-top: 30px; width: 200px"
+              style="margin-left: 30px; margin-top: 30px; text-align: center;width: 200px; "
             >
-              Choose a file to upload: <br />
-              <br />
-              <input name="files" id="uploadfile" type="file" /> <br />
-              <div id="results2" style="width: 200px; margin-top: 50px "></div>
+              <div class="fa-1x">
+                <div class="element">
+                  <button
+                    id="fileuploadbutton"
+                    type="button"
+                    class="btn btn-primary btn-lg"
+                    style="margin-right: 10px;"
+                  >
+                    <i class="fa fa-upload"></i> Choose file for inferencing !
+                  </button>
+
+                  <input
+                    name="files"
+                    id="uploadfile"
+                    type="file"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+
+              <!--
+                <label class="btn btn-default"
+                  ><input name="files" id="uploadfile" type="file"
+                /></label>
+              -->
+
+              <div id="results2" style=" margin-top: 50px ; "></div>
             </div>
 
             <div class="col" style="margin: 20px;width: 600px;">
