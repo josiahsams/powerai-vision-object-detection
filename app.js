@@ -20,53 +20,36 @@
 const express = require("express");
 const request = require("request");
 
-const MISSING_ENV =
-  "Missing required runtime environment variable POWERAI_VISION_WEB_API_URL";
-
 require("dotenv").config({
   silent: true
 });
 
 const app = express();
 const port = process.env.PORT || process.env.VCAP_APP_PORT || 8081;
-const poweraiVisionWebApiUrl = process.env.POWERAI_VISION_WEB_API_URL;
-// app.use(formidable());
 
-console.log("Web API URL: " + poweraiVisionWebApiUrl);
-
-if (!poweraiVisionWebApiUrl) {
-  console.log(MISSING_ENV);
-}
-
-app.use(express.static(__dirname));
+app.use(express.static(__dirname + "/dist"));
+app.use(express.static(__dirname + "/dist/web_model"));
 
 app.post("/uploadpic", function(req, result) {
-  if (!poweraiVisionWebApiUrl) {
-    console.log(MISSING_ENV);
-    result.send({ data: JSON.stringify({ error: MISSING_ENV }) });
-  } else {
-    req.pipe(
-      request.post(
-        {
-          url: poweraiVisionWebApiUrl,
-          // headers: {
-          //   Authorization: "Bearer 6c3e9127-3af1-45ea-9b37-fc41c1986a51"
-          // },
-          gzip: true,
-          agentOptions: {
-            rejectUnauthorized: false
-          }
-        },
-        function(err, resp, body) {
-          if (err) {
-            console.log(err);
-          }
-          console.log(body);
-          result.send({ data: body });
+  req.pipe(
+    request.post(
+      {
+        // url: "http://dlw07.aus.stglabs.ibm.com:5000/",
+        url: "http://localhost:8888/",
+        // gzip: true,
+        agentOptions: {
+          rejectUnauthorized: false
         }
-      )
-    );
-  }
+      },
+      function(err, resp, body) {
+        if (err) {
+          console.log(err);
+        }
+        console.log(body);
+        result.send({ data: body });
+      }
+    )
+  );
 });
 
 app.listen(port, () => {

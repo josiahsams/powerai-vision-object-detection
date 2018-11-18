@@ -14,7 +14,15 @@
   },
   "homepage": "https://github.com/IBM/powerai-vision-object-detection#readme",
   "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
     "chai": "^4.1.2",
+    "clang-format": "~1.2.2",
+    "cross-env": "^5.1.6",
     "eslint": "^4.16.0",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-node": "^5.2.1",
@@ -23,10 +31,16 @@
     "jsdom": "^11.6.2",
     "jsdom-global": "^3.0.2",
     "mocha": "^5.0.0",
+    "parcel-bundler": "~1.10.3",
     "sinon": "^4.2.2",
-    "sinon-test": "^2.1.3"
+    "sinon-test": "^2.1.3",
+    "yalc": "~1.0.0-pre.22"
   },
   "scripts": {
+    "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --open",
+    "build": "cross-env NODE_ENV=production parcel build index.html  --no-minify --public-url ./",
+    "link-local": "yalc link",
+    "postinstall": "yarn upgrade --pattern @tensorflow",
     "start": "node app.js",
     "lint": "npm run lint:javascript",
     "eslint": "eslint *.js js test",
@@ -35,11 +49,13 @@
     "unit": "istanbul cover _mocha -V test/unit -- -R spec"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^0.13.5",
     "dotenv": "^4.0.0",
     "express": "4.16.2",
-    "request": "^2.87.0"
+    "request": "^2.87.0",
+    "vega-embed": "^3.24.1"
   },
   "engines": {
-    "node": "8.x"
+    "node": ">=8.9.0"
   }
 }

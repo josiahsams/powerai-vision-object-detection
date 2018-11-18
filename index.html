@@ -54,12 +54,17 @@
       <ul class="nav nav-tabs">
         <li class="nav-item">
           <a class="nav-link active" href="#cam" data-toggle="tab">
-            Camera Mode <i class="fas fa-video"></i>
+            Camera Mode <i class="fas fa-camera-retro"></i>
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#fil" data-toggle="tab">
             File Mode <i class="fas fa-file-image"></i
+          ></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#liv" data-toggle="tab">
+            Live Mode <i class="fas fa-video"></i
           ></a>
         </li>
       </ul>
@@ -69,7 +74,11 @@
           <div class="row">
             <div class="col">
               <div id="videocontainer">
-                <video autoplay="true" id="videoElement"></video>
+                <video
+                  autoplay="true"
+                  id="videoElement"
+                  style="width: 480px; height: 360px;"
+                ></video>
               </div>
             </div>
             <div class="col" style="width: 100px;">
@@ -79,8 +88,10 @@
               >
                 <div class="fa-2x">
                   Click capture !! <br />
+
                   <i class="fas fa-camera fa-large"></i>
                 </div>
+                (Gesture Detection on !!)
               </div>
             </div>
             <div class="col">
@@ -152,9 +163,56 @@
             </div>
           </div>
         </div>
+
+        <div class="tab-pane" id="liv">
+          <div class="row">
+            <div
+              class="col"
+              style="margin-left: 30px; margin-top: 30px; text-align: center;width: 200px; "
+            >
+              <div class="fa-1x">
+                <div class="element">
+                  <div class="col text-center">
+                    <button
+                      id="startFeed"
+                      type="button"
+                      class="btn btn-primary btn-lg"
+                      style="margin-right: 100px;"
+                    >
+                      Start Feed <i class="fas fa-camera"></i>
+                    </button>
+                    <button
+                      id="stopFeed"
+                      type="button"
+                      class="btn btn-secondary btn-lg"
+                    >
+                      Stop Feed <i class="fas fa-ban"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col text-center" style="margin: 20px;width: 800px;">
+              <div style="margin-top: 10px; ">
+                <figure class="figure">
+                  <img
+                    id="grid3"
+                    class="figure-img img-fluid rounded"
+                    width="480px"
+                    height="360px"
+                  />
+                </figure>
+              </div>
+              <br />
+              <div id="results3" style="display: none "></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
+    <div id="status"></div>
     <script type="text/javascript" src="js/index.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
