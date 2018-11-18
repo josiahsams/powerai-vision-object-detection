@@ -6,7 +6,7 @@
 
   Provide webcam access for this page during load. Once loaded, you can take snapshots from the UI and send it for inference. This model used here is ssd_mobilenet_v1_coco [Reference](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md).
 
-![Camera Mode](doc/source/images/camera_mode.png)
+![Camera Mode](doc/source/images/camera_mode.png =250x)
 
   For inferencing, this application expects a model inferencing service running in port 8888. So refer `runserver2.py` to start this service.
 
@@ -15,7 +15,7 @@
 	1. Give a thumbs up to take a screenshot.
 	2. Show a high 5 to stop the gesture detection.
 
-![Gesture Mode](doc/source/images/camera_gesture.png)
+![Gesture Mode](doc/source/images/camera_gesture.png =50x)
 
 	Note: Tensorflow.js is used here. The model used here is mobilenet. [Reference](https://github.com/tensorflow/tfjs-examples/tree/master/mobilenet)
 
@@ -23,7 +23,7 @@
 
 	Upload local image file for inferencing using the same model ssd_mobilenet_v1_coco.
 
-![File Mode](doc/source/images/file_mode.png)
+![File Mode](doc/source/images/file_mode.png =250x)
 
 	This inferencing is also obtained from the model inferencing service mentioned above.
 
@@ -31,7 +31,7 @@
 	
   Perform live object detection using the ssd_mobilenet_v1_coco model. 
   
-  ![Live Mode](doc/source/images/live_mode.png)
+  ![Live Mode](doc/source/images/live_mode.png =250x)
   
   To make it run in browser, a webmodel is created as follows,
 
@@ -41,13 +41,13 @@
 	     detection_scores, detection_classes"                    \
 	     ./model/frozen_inference_graph.pb                       \
 	     ./web_model
-```	     
+```
 
   Then this webmodel is used for further live predictions.
 
-### Note:
+###  Note:
 
-	The pre-trained tensorflow.js models are also provided in this repo. Make sure you copy them to the `dist` folder before starting the node application.
+  The pre-trained tensorflow.js models are also provided in this repo. Make sure you copy them to the `dist` folder before starting the node application.
 
 ### Steps to run this example,
 
