@@ -12,20 +12,20 @@
 
   This page is also capable for 2 gesture detection,
 
-	1. Give a thumbs up to take a screenshot.
-	2. Show a high 5 to stop the gesture detection.
+  1. Give a thumbs up to take a screenshot.
+  2. Show a high 5 to stop the gesture detection.
 
 ![Gesture Mode](doc/source/images/camera_gesture.png )
 
-	Note: Tensorflow.js is used here. The model used here is mobilenet. [Reference](https://github.com/tensorflow/tfjs-examples/tree/master/mobilenet)
+  Note: Tensorflow.js is used here. The model used here is mobilenet. [Reference](https://github.com/tensorflow/tfjs-examples/tree/master/mobilenet)
 
 ### 2. File Mode:
 
-	Upload local image file for inferencing using the same model ssd_mobilenet_v1_coco.
+  Upload local image file for inferencing using the same model ssd_mobilenet_v1_coco.
 
 ![File Mode](doc/source/images/file_mode.png)
 
-	This inferencing is also obtained from the model inferencing service mentioned above.
+  This inferencing is also obtained from the model inferencing service mentioned above.
 
 ### 3. Live Mode:
 	
@@ -51,9 +51,9 @@
 
 ### Steps to run this example,
 
-Clone this Repo,
+  Clone this Repo,
 
-To install all the nodejs dependency modules,
+  To install all the nodejs dependency modules,
 
 ```
 $ yarn
