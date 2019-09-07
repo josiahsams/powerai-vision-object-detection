@@ -50,22 +50,13 @@ function addRow(table, cellType, values) {
  * @return {string}
  */
 function textColor(label) {
-  switch (label) {
-    case "no_glove":
-      return "white";
-    case "no_helmet":
-      return "red";
-    case "no_vest":
-      return "white";
-    case "glove":
-      return "white";
-    case "helmet":
-      return "red";
-    case "vest":
-      return "white";
-    default:
-      return "cornsilk";
-  }
+    if (label.includes("severe")) {
+        return "white";
+    } else if (label.includes("moderate")) {
+        return "black";
+    } else {
+        return "white";
+    }
 }
 
 /**
@@ -74,22 +65,13 @@ function textColor(label) {
  * @return {string}
  */
 function boundaryColor(label) {
-  switch (label) {
-    case "no_glove":
-      return "red";
-    case "no_helmet":
-      return "silver";
-    case "no_vest":
-      return "black";
-    case "glove":
-      return "red";
-    case "helmet":
-      return "silver";
-    case "vest":
-      return "black";
-    default:
-      return "cornflowerblue";
-  }
+    if (label.includes("severe")) {
+        return "red";
+    } else if (label.includes("moderate")) {
+        return "yellow";
+    } else {
+        return "cornflowerblue";
+    }
 }
 
 /**
@@ -121,35 +103,64 @@ function countByLabel(detectedObjects) {
  * @param {[]} detectedObjects
  * @param {Object} ctx
  */
-function drawBoundaryBoxes(detectedObjects, ctx) {
-  ctx.lineWidth = 5;
-  ctx.font = "24px serif";
+function drawBoundaryBoxes(detectedObjects, ctx, scale=1.0) {
+  ctx.lineWidth = 2;
+  // ctx.font = "24px serif";
 
   if (detectedObjects.length > 0) {
     for (let i = 0; i < detectedObjects.length; i++) {
       const obj = detectedObjects[i];
       const label = obj["label"];
       const color = boundaryColor(label);
+
       ctx.strokeStyle = color;
-      const xmin = obj["xmin"];
-      const ymin = obj["ymin"];
-      const xmax = obj["xmax"];
-      const ymax = obj["ymax"];
+      const xmin = obj["xmin"]/scale;
+      const ymin = obj["ymin"]/scale;
+      const xmax = obj["xmax"]/scale;
+      const ymax = obj["ymax"]/scale;
       ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
 
       // Now fill a rectangle at the top to put some text on.
       ctx.fillStyle = color;
-      ctx.fillRect(xmin, ymin, xmax - xmin, 25);
-      ctx.fillStyle = textColor(label);
+      ctx.globalAlpha = 0.2;
+      ctx.fillRect(xmin, ymin, xmax - xmin, 16);
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = boundaryColor(label);
+
+      var printText;
+      if (label.includes("severe")) {
+          printText = "Severe"
+      } else if (label.includes("moderate")) {
+          printText = "Moderate"
+      } else {
+          printText = "Low"
+      }
+
+      ctx.font = "12px Georgia Bold";
       ctx.fillText(
-        label + ": " + obj["confidence"].toFixed(3),
+        obj["confidence"].toFixed(2) + " %",
         xmin + 5,
-        ymin + 20
+        ymin + 12
       );
     }
   }
 }
 
+function countSeverity(detectedObjects, severity) {
+    if (detectedObjects.length > 0) {
+        let count = 0;
+        for (let i = 0; i < detectedObjects.length; i++) {
+            const obj = detectedObjects[i];
+            const label = obj["label"];
+            if (label.includes(severity)) {
+                count++;
+            }
+        }
+        return count;
+    } else {
+        return 0;
+    }
+}
 /**
  * Create and populate a table to show the result details.
  * @param {[]} detectedObjects
@@ -161,17 +172,28 @@ function detectedObjectsTable(detectedObjects, parent) {
 
     // addRow(table, "th", ["Label", "Conf", "Min Pos", "Max Pos"]);
 
-    addRow(table, "th", ["Items", "Safety"]);
-    for (let i = 0; i < detectedObjects.length; i++) {
-      const obj = detectedObjects[i];
-      const label = obj["label"];
-      // const safe = label.contains("no") ? "Down" : "Up";
-      let safe = "<i class='far fa-thumbs-up fa-2x' style='color:green'></i>";
-      if (label.includes("no")) {
-        safe = "<i class='far fa-thumbs-down fa-2x' style='color:red'></i>";
-      }
-      addRow(table, "td", [label, safe]);
-    }
+    addRow(table, "th", ["Damage Severity", "Count"]);
+    severe_count = countSeverity(detectedObjects, "severe");
+    severe_cost = severe_count * 5000;
+    addRow(table, "td", ["Severe: claim range (from $5000 and above)", severe_count.toString()]);
+    moderate_count = countSeverity(detectedObjects, "moderate");
+    moderate_cost = moderate_count * 2000;
+    addRow(table, "td", ["Moderate: claim range (from $2000 to $5000)", moderate_count.toString()]);
+    low_count = detectedObjects.length - (severe_count + moderate_count);
+    low_count = low_count * 1000;
+    addRow(table, "td", ["Low", low_count.toString()]);
+    addRow(table, "td", ["Total estimate claim cost in USD", "$"+(severe_cost + moderate_cost + low_count).toString()]);
+
+    // for (let i = 0; i < detectedObjects.length; i++) {
+    //   const obj = detectedObjects[i];
+    //   const label = obj["label"];
+    //   // const safe = label.contains("no") ? "Down" : "Up";
+    //   let safe = "<i class='far fa-thumbs-up fa-2x' style='color:green'></i>";
+    //   if (label.includes("no")) {
+    //     safe = "<i class='far fa-thumbs-down fa-2x' style='color:red'></i>";
+    //   }
+    //   addRow(table, "td", [label, safe]);
+    // }
     parent.appendChild(table);
   }
 }
@@ -183,41 +205,36 @@ window.addEventListener("load", function() {
    * Populate the article with formatted results.
    * @param {Object} jsonResult
    */
-  function populateArticle(jsonResult, myImg, article) {
+  function populateArticle(jsonResult, myImg, article, imgOrigWidth=0) {
     // Remove previous results
     article.innerHTML = "";
 
-    // Show the image if one was returned.
     if (jsonResult.hasOwnProperty("imageUrl")) {
-      // const myImg = new Image();
-      // const myImg = document.querySelector("#grid");
-      // myImg.style.display = "none";
-
       const myCanvas = document.createElement("canvas");
       const ctx = myCanvas.getContext("2d");
       ctx.canvas.height = myImg.height;
       ctx.canvas.width = myImg.width;
+      console.log(myImg.width + " :: " + myImg.height);
+      // ctx.drawImage(myImg, 0, 0, 1280, 720, 0, 0, myImg.width, myImg.height);
       ctx.drawImage(myImg, 0, 0, myImg.width, myImg.height);
       if (jsonResult.hasOwnProperty("classified")) {
-        drawBoundaryBoxes(jsonResult.classified, ctx);
+          if (imgOrigWidth != 0) {
+              drawBoundaryBoxes(jsonResult.classified, ctx, imgOrigWidth/myImg.width );
+          } else {
+              drawBoundaryBoxes(jsonResult.classified, ctx);
+          }
       }
 
-      //article.appendChild(myCanvas);
       myImg.setAttribute("src", myCanvas.toDataURL());
-
-      // document
-      //   .querySelector("#grid")
-      //   .setAttribute("srcObject", myImg.srcObject);
-
-      //  myImg.src = imgSrc;
-      // article.appendChild(myImg);
     }
 
+    // undo it after demo
     if (jsonResult.hasOwnProperty("classified")) {
       let classified = jsonResult.classified;
 
       const myCount = document.createElement("h5");
-      myCount.textContent = classified.length + " objects detected";
+      // myCount.textContent = classified.length + " objects detected";
+      myCount.textContent = "Summary Report: ( " + classified.length + " ) damages detected" ;
       article.appendChild(myCount);
       // article.appendChild(document.createTextNode(countByLabel(classified)));
 
@@ -289,8 +306,8 @@ window.addEventListener("load", function() {
     document.querySelector("body").appendChild(canvas);
 
     const videoElement = document.querySelector("#videoElement");
-    canvas.width = 480;
-    canvas.height = 360;
+    canvas.width = 256;
+    canvas.height = 144;
 
     canvas
       .getContext("2d")
@@ -298,9 +315,10 @@ window.addEventListener("load", function() {
 
     // get image data URL and remove canvas
     const snapshot = canvas.toDataURL("image/png");
-    canvas.parentNode.removeChild(canvas);
 
-    document.querySelector("#grid").setAttribute("src", snapshot);
+    // JOE
+    document.querySelector("#hiddengrid").setAttribute("src", snapshot);
+    canvas.parentNode.removeChild(canvas);
 
     // Load the captured image into the form data before posting
     const formData = new FormData();
@@ -319,42 +337,63 @@ window.addEventListener("load", function() {
         return response.json();
       })
       .then(rawJson => {
-        imgSrc = document.getElementById("grid").src;
+        imgSrc = document.getElementById("hiddengrid").src;
+
+        document.querySelector("#grid").setAttribute("src", snapshot);
+
         let rawJsonJson = JSON.parse(rawJson.data);
+        // JOE
+
         populateArticle(
           rawJsonJson,
           document.querySelector("#grid"),
           document.querySelector("#results")
         );
       });
-    document.querySelector("#results").innerHTML =
-      "<div> \
-        <div class='fa-4x'>  \
-          <i class='fas fa-cog fa-large fa-spin'></i> \
-        </div><br/>Uploading the image <br/>for inferencing ... </div>";
+    // undo it after demo
+    // document.querySelector("#results").innerHTML =
+    //   "<div> \
+    //     <div class='fa-4x'>  \
+    //       <i class='fas fa-cog fa-large fa-spin'></i> \
+    //     </div><br/>Uploading the image <br/>for inferencing ... </div>";
   };
 
-  var constraints = { audio: false, video: { width: 640, height: 480 } };
+  var constraints = { audio: false, video: { width: 256, height: 144 } };
+  let timer = 0;
+  const timeOutFn = () => {
+    capture();
+    timer = setTimeout(() => timeOutFn(), 1000);
+  };
+  const stopTimeOutFn = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = 0;
+    }
+  };
 
-  var video = document.querySelector("#videoElement");
-  var localstream;
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function(stream) {
-        video.srcObject = stream;
-        localstream = stream;
-        document.getElementById("capture").addEventListener("click", () => {
-          capture();
-        });
-        document.getElementById("stop").addEventListener("click", () => {
-          stopVideo();
-        });
-      })
-      .catch(function(error) {
-        console.log("Something went wrong!");
-      });
-  }
+  // var video = document.querySelector("#videoElement");
+  // var localstream;
+  // if (navigator.mediaDevices.getUserMedia) {
+  //   navigator.mediaDevices
+  //     .getUserMedia(constraints)
+  //     .then(function(stream) {
+  //       video.srcObject = stream;
+  //       localstream = stream;
+  //       document.getElementById("capture").addEventListener("click", () => {
+  //         capture();
+  //       });
+  //       timer = setTimeout(() => timeOutFn(), 2000);
+  //       document.getElementById("stop").addEventListener("click", () => {
+  //         stopVideo();
+  //       });
+  //       document.getElementById("stopFeed").addEventListener("click", () => {
+  //         stopTimeOutFn();
+  //       });
+  //     })
+  //     .catch(function(error) {
+  //       console.log("Something went wrong!");
+  //     });
+  // }
   function stopVideo() {
     //clearInterval(theDrawLoop);
     //ExtensionData.vidStatus = 'off';
@@ -370,38 +409,51 @@ window.addEventListener("load", function() {
 
     var reader = new FileReader();
     reader.onload = function() {
+      var image = new Image();
       dataURL = reader.result;
       var output = document.getElementById("uploadImg");
-      output.src = dataURL;
+      image.src = dataURL;
 
-      // Load the captured image into the form data before posting
-      const formData = new FormData();
-      var blob = dataURLtoBlob(dataURL);
-      console.log(blob);
-      formData.append("files", blob, "sample.png");
+      image.onload = function() {
+          imgOrigWidth = this.width;
+          imgOrigHeight = this.height;
+          output.src = this.src;
+          // Load the captured image into the form data before posting
+          const formData = new FormData();
+          var blob = dataURLtoBlob(dataURL);
+          console.log(blob);
+          formData.append("files", blob, "sample.png");
 
-      // send a async post request
-      fetch("./uploadpic", {
-        method: "POST",
-        redirect: "follow",
-        body: formData
-      })
-        .then(response => {
-          console.log(response);
-          return response.json();
-        })
-        .then(rawJson => {
-          imgSrc = document.getElementById("uploadImg").src;
-          let rawJsonJson = JSON.parse(rawJson.data);
-          populateArticle(
-            rawJsonJson,
-            document.querySelector("#uploadImg"),
-            document.querySelector("#results2")
-          );
-        });
+          // send a async post request
+          fetch("./uploadpic", {
+            method: "POST",
+            redirect: "follow",
+            body: formData
+          })
+            .then(response => {
+              console.log(response);
+              return response.json();
+            })
+            .then(rawJson => {
+              // imgSrc = document.getElementById("uploadImg").src;
+              let rawJsonJson = JSON.parse(rawJson.data);
+              populateArticle(
+                rawJsonJson,
+                document.querySelector("#uploadImg"),
+                document.querySelector("#results2"),
+                imgOrigWidth
+              );
+
+              // document.querySelector("#outPopUp").style.display = 'none';
+            });
+      };
+      // output.src = dataURL;
     };
+
+    // document.querySelector("#outPopUp").style.display = 'block';
+
     document.querySelector("#results2").innerHTML =
-      "<div> \
+      "<div align='center'> \
       <div class='fa-4x'>  \
         <i class='fas fa-cog fa-large fa-spin'></i> \
       </div><br/>Uploading the image <br/>for inferencing ... </div>";
