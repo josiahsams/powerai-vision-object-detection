@@ -306,8 +306,10 @@ window.addEventListener("load", function() {
     document.querySelector("body").appendChild(canvas);
 
     const videoElement = document.querySelector("#videoElement");
-    canvas.width = 256;
-    canvas.height = 144;
+    // canvas.width = 256;
+    // canvas.height = 144;
+    canvas.width = 480;
+    canvas.height = 360;
 
     canvas
       .getContext("2d")
@@ -358,7 +360,8 @@ window.addEventListener("load", function() {
     //     </div><br/>Uploading the image <br/>for inferencing ... </div>";
   };
 
-  var constraints = { audio: false, video: { width: 256, height: 144 } };
+  // var constraints = { audio: false, video: { width: 256, height: 144 } };
+  let constraints = { audio: false, video: { width: 480, height: 360 } };
   let timer = 0;
   const timeOutFn = () => {
     capture();
