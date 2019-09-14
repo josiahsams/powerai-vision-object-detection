@@ -5,7 +5,7 @@
 ### Screenshots from Safety related Inferencing Model:
 
 
-![File Mode](doc/source/images/car1.png)
+![File Mode](doc/source/images/car2.png)
 
 In this Code Pattern, we will use PowerAI Vision Object Detection
 to detect and label objects, within an image, based on customized
