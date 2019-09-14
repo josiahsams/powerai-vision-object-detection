@@ -28,11 +28,17 @@ table {
   table-layout: fixed;
 }
 
-th,
+th {
+    text-align: left;
+    font-weight: 'bold';
+    padding: 8px;
+    width: 100%;
+    height: 40px;
+}
 td {
   text-align: left;
-  padding: 8px;
   width: 100%;
+  height: 40px;
 }
 
 tr:nth-child(even) {
@@ -43,6 +49,13 @@ tr th:nth-child(n + 2) {
 }
 tr td:nth-child(n + 2) {
   text-align: right;
+}
+
+td div {
+    margin: auto;
+    vertical-align: middle;
+    height: 100%;
+    padding: 10px;
 }
 
 #videocontainer {

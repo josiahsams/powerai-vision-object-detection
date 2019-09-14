@@ -30,7 +30,7 @@ function addRow(table, cellType, values) {
   for (let i = 0; i < values.length; i++) {
     const val = values[i];
     const cell = document.createElement(cellType);
-    if (val.includes("i class")) {
+    if (val.includes("style")) {
       // const text = document.createElement("div");
       // console.log(val);
       cell.innerHTML = val;
@@ -175,14 +175,14 @@ function detectedObjectsTable(detectedObjects, parent) {
     addRow(table, "th", ["Damage Severity", "Count"]);
     severe_count = countSeverity(detectedObjects, "severe");
     severe_cost = severe_count * 5000;
-    addRow(table, "td", ["Severe: claim range (from $5000 and above)", severe_count.toString()]);
+    addRow(table, "td", ["<div style='border-left: 8px solid red; padding-left: 10px'> Severe: claim range (from $5000 and above) </div>", severe_count.toString()]);
     moderate_count = countSeverity(detectedObjects, "moderate");
     moderate_cost = moderate_count * 2000;
-    addRow(table, "td", ["Moderate: claim range (from $2000 to $5000)", moderate_count.toString()]);
+    addRow(table, "td", ["<div style='border-left: 8px solid yellow; padding-left: 10px'>Moderate: claim range (from $2000 to $5000)</div>", moderate_count.toString()]);
     low_count = detectedObjects.length - (severe_count + moderate_count);
     low_count = low_count * 1000;
-    addRow(table, "td", ["Low", low_count.toString()]);
-    addRow(table, "td", ["Total estimate claim cost in USD", "$"+(severe_cost + moderate_cost + low_count).toString()]);
+    addRow(table, "td", ["<div style='border-left: 8px solid blue; padding-left: 10px'>Minor</div>", low_count.toString()]);
+    addRow(table, "td", ["<div style='font-weight: bold'>Total estimate claim cost in USD </div>", "$"+(severe_cost + moderate_cost + low_count).toString()]);
 
     // for (let i = 0; i < detectedObjects.length; i++) {
     //   const obj = detectedObjects[i];
