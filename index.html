@@ -57,9 +57,13 @@
     <div id="container">
 
       <ul class="nav nav-tabs">
-
+          <li class="nav-item">
+            <a class="nav-link active" href="#cam" data-toggle="tab">
+              Camera Mode <i class="fas fa-video"></i>
+            </a>
+          </li>
         <li class="nav-item">
-          <a class="nav-link active" href="#fil" data-toggle="tab">
+          <a class="nav-link" href="#fil" data-toggle="tab">
             File Mode <i class="fas fa-file-image"></i
           ></a>
         </li>
@@ -67,8 +71,51 @@
 
       <div class="tab-content clearfix">
 
+          <div class="tab-pane active" id="cam">
+            <div class="row">
+              <div class="col">
+                <div id="videocontainer">
+                  <video autoplay="true" id="videoElement"></video>
+                </div>
+              </div>
+              <div class="col" style="width: 100px;">
+                <div
+                  id="results"
+                  style="margin-top: 50px;align-content: center;text-align: center; "
+                >
+                  <div class="fa-2x">
+                    Click capture !! <br />
+                    <i class="fas fa-camera fa-large"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div style="width: 500px;margin-top: 10px; ">
+                  <figure class="figure">
+                    <img id="grid" class="figure-img img-fluid rounded" />
+                  </figure>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col text-center">
+                <button
+                  id="capture"
+                  type="button"
+                  class="btn btn-primary btn-lg"
+                  style="margin-right: 100px;"
+                >
+                  Capture & Detect <i class="fas fa-camera"></i>
+                </button>
+                <button id="stop" type="button" class="btn btn-secondary btn-lg">
+                  Stop Camera <i class="fas fa-ban"></i>
+                </button>
+              </div>
+            </div>
+          </div>
 
-        <div class="tab-pane active" id="fil">
+
+        <div class="tab-pane" id="fil">
 
           <div class="row">
             <div

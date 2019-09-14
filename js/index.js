@@ -371,29 +371,29 @@ window.addEventListener("load", function() {
     }
   };
 
-  // var video = document.querySelector("#videoElement");
-  // var localstream;
-  // if (navigator.mediaDevices.getUserMedia) {
-  //   navigator.mediaDevices
-  //     .getUserMedia(constraints)
-  //     .then(function(stream) {
-  //       video.srcObject = stream;
-  //       localstream = stream;
-  //       document.getElementById("capture").addEventListener("click", () => {
-  //         capture();
-  //       });
-  //       timer = setTimeout(() => timeOutFn(), 2000);
-  //       document.getElementById("stop").addEventListener("click", () => {
-  //         stopVideo();
-  //       });
-  //       document.getElementById("stopFeed").addEventListener("click", () => {
-  //         stopTimeOutFn();
-  //       });
-  //     })
-  //     .catch(function(error) {
-  //       console.log("Something went wrong!");
-  //     });
-  // }
+  var video = document.querySelector("#videoElement");
+  var localstream;
+  if (navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(function(stream) {
+        video.srcObject = stream;
+        localstream = stream;
+        document.getElementById("capture").addEventListener("click", () => {
+          capture();
+        });
+        timer = setTimeout(() => timeOutFn(), 2000);
+        document.getElementById("stop").addEventListener("click", () => {
+          stopVideo();
+        });
+        document.getElementById("stopFeed").addEventListener("click", () => {
+          stopTimeOutFn();
+        });
+      })
+      .catch(function(error) {
+        console.log("Something went wrong!");
+      });
+  }
   function stopVideo() {
     //clearInterval(theDrawLoop);
     //ExtensionData.vidStatus = 'off';
