@@ -70,6 +70,11 @@ td div {
   background-color: #666;
 }
 
+video {
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
+
 #outPopUp {
   /* position: absolute; */
   display: none;

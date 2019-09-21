@@ -216,7 +216,9 @@ window.addEventListener("load", function() {
       ctx.canvas.width = myImg.width;
       console.log(myImg.width + " :: " + myImg.height);
       // ctx.drawImage(myImg, 0, 0, 1280, 720, 0, 0, myImg.width, myImg.height);
+
       ctx.drawImage(myImg, 0, 0, myImg.width, myImg.height);
+
       if (jsonResult.hasOwnProperty("classified")) {
           if (imgOrigWidth != 0) {
               drawBoundaryBoxes(jsonResult.classified, ctx, imgOrigWidth/myImg.width );
@@ -310,10 +312,12 @@ window.addEventListener("load", function() {
     // canvas.height = 144;
     canvas.width = 480;
     canvas.height = 360;
+    const ctx = canvas.getContext("2d");
 
-    canvas
-      .getContext("2d")
-      .drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    ctx.translate(480, 0);
+    ctx.scale(-1, 1);
+
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
     // get image data URL and remove canvas
     const snapshot = canvas.toDataURL("image/png");
@@ -360,12 +364,16 @@ window.addEventListener("load", function() {
     //     </div><br/>Uploading the image <br/>for inferencing ... </div>";
   };
 
+
   // var constraints = { audio: false, video: { width: 256, height: 144 } };
   let constraints = { audio: false, video: { width: 480, height: 360 } };
   let timer = 0;
   const timeOutFn = () => {
     capture();
     timer = setTimeout(() => timeOutFn(), 1000);
+  };
+  const startFeed = () => {
+      timer = setTimeout(() => timeOutFn(), 2000);
   };
   const stopTimeOutFn = () => {
     if (timer) {
@@ -385,18 +393,25 @@ window.addEventListener("load", function() {
         document.getElementById("capture").addEventListener("click", () => {
           capture();
         });
-        timer = setTimeout(() => timeOutFn(), 2000);
+
         document.getElementById("stop").addEventListener("click", () => {
           stopVideo();
         });
-        document.getElementById("stopFeed").addEventListener("click", () => {
-          stopTimeOutFn();
+        document.getElementById("feedAction").addEventListener("click", () => {
+            if(timer) {
+                stopTimeOutFn();
+                $('#feedAction').html("Start Feed <i class='fas fa-check'></i>");
+            } else {
+                startFeed();
+                $('#feedAction').html("Stop Feed <i class='fas fa-times'></i>");
+            }
         });
       })
       .catch(function(error) {
         console.log("Something went wrong!");
       });
   }
+
   function stopVideo() {
     //clearInterval(theDrawLoop);
     //ExtensionData.vidStatus = 'off';
