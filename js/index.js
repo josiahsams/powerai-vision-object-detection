@@ -68,6 +68,25 @@ function textColor(label) {
   }
 }
 
+function backColor(label) {
+  switch (label) {
+    case "no_glove":
+      return "rgba(224, 34, 34, 0.5)";
+    case "no_helmet":
+      return "#rgba(224, 34, 34, 0.5)";
+    case "no_vest":
+      return "rgba(224, 34, 34, 0.5)";
+    case "glove":
+      return "rgba(196, 224, 34, 0.5)";
+    case "helmet":
+      return "rgba(196, 224, 34, 0.5)";
+    case "vest":
+      return "rgba(196, 224, 34, 0.5)";
+    default:
+      return "cornsilk";
+  }
+}
+
 /**
  * Get the boundary box color to use given a label string.
  * @param {string} label
@@ -150,6 +169,26 @@ function drawBoundaryBoxes(detectedObjects, ctx) {
   }
 }
 
+function drawPolygons(detectedObjects, ctx) {
+  ctx.lineWidth = 5;
+  ctx.font = "24px serif";
+
+  if (detectedObjects.length > 0) {
+    for (let i = 0; i < detectedObjects.length; i++) {
+      const obj = detectedObjects[i]["polygons"][0];
+      const label = detectedObjects[i]["label"];
+      ctx.fillStyle = backColor(label);
+      ctx.beginPath();
+      ctx.moveTo(obj[0][0], obj[0][1]);
+      for (let j = 1; j < obj.length; j++) {
+        ctx.lineTo(obj[j][0], obj[j][1]);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+
 /**
  * Create and populate a table to show the result details.
  * @param {[]} detectedObjects
@@ -199,7 +238,8 @@ window.addEventListener("load", function() {
       ctx.canvas.width = myImg.width;
       ctx.drawImage(myImg, 0, 0, myImg.width, myImg.height);
       if (jsonResult.hasOwnProperty("classified")) {
-        drawBoundaryBoxes(jsonResult.classified, ctx);
+        // drawBoundaryBoxes(jsonResult.classified, ctx);
+        drawPolygons(jsonResult.classified, ctx);
       }
 
       //article.appendChild(myCanvas);
@@ -218,10 +258,9 @@ window.addEventListener("load", function() {
 
       const myCount = document.createElement("h5");
       myCount.textContent = classified.length + " objects detected";
-      article.appendChild(myCount);
-      // article.appendChild(document.createTextNode(countByLabel(classified)));
+      // article.appendChild(myCount);
 
-      detectedObjectsTable(classified, article);
+      // detectedObjectsTable(classified, article);
     } else {
       const myDiv = document.createElement("div");
       myDiv.className = "error";
@@ -405,6 +444,8 @@ window.addEventListener("load", function() {
       <div class='fa-4x'>  \
         <i class='fas fa-cog fa-large fa-spin'></i> \
       </div><br/>Uploading the image <br/>for inferencing ... </div>";
+
+
     reader.readAsDataURL(input.files[0]);
   };
 
